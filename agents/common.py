@@ -108,6 +108,7 @@ def apply_player_action(
     Sets board[i, action] = player, where i is the lowest open row. The modified
     board is returned. If copy is True, makes a copy of the board before modifying it.
     """
+    action = np.int(action)
     if np.int(action) < 0 or np.int(action) > 6:
         raise ValueError
     i = 0
@@ -202,4 +203,3 @@ def check_end_state(
     if NO_PLAYER in board:
         return GameState.STILL_PLAYING
     return GameState.IS_DRAW
-

@@ -125,7 +125,7 @@ def test_apply_player_action():
 
     action = PlayerAction(3)
     player = PLAYER1
-    board = initialize_game_state()
+    board = initialize_game_state()  # TODO replace it with hardcoded board
     board_after_action = apply_player_action(board, action, player)
     assert board_after_action.shape == board.shape
     assert board_after_action.any() == PLAYER1
@@ -135,14 +135,14 @@ def test_apply_player_action():
 def test_connect_four():
     from agents.common import connected_four
 
-    assert connected_four(b1, PLAYER1) == False
-    assert connected_four(b1, PLAYER2) == False
-    assert connected_four(b2, PLAYER1) == False
-    assert connected_four(b2, PLAYER2) == True
-    assert connected_four(b3, PLAYER1) == True
-    assert connected_four(b3, PLAYER2) == False
-    assert connected_four(b4, PLAYER1) == True
-    assert connected_four(b4, PLAYER2) == False
+    assert not connected_four(b1, PLAYER1)
+    assert not connected_four(b1, PLAYER2)
+    assert not connected_four(b2, PLAYER1)
+    assert connected_four(b2, PLAYER2)
+    assert connected_four(b3, PLAYER1)
+    assert not connected_four(b3, PLAYER2)
+    assert connected_four(b4, PLAYER1)
+    assert not connected_four(b4, PLAYER2)
 
 
 def test_check_end_state():
