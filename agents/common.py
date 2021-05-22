@@ -118,8 +118,31 @@ def apply_player_action(
         if copy:
             initial_board = np.copy(board)  # what do we do with this copy?
         board[i, action] = player
-
+    # else:
+    #     raise ValueError
     return board
+
+
+def generate_main_diagonals(board: np.ndarray):
+    main_diagonals = []
+    main_diagonals.append([board[i, i] for i in range(0, 6)])
+    main_diagonals.append([board[i, i - 1] for i in range(1, 6)])
+    main_diagonals.append([board[i, i - 2] for i in range(2, 6)])
+    main_diagonals.append([board[i, i + 1] for i in range(0, 6)])
+    main_diagonals.append([board[i, i + 2] for i in range(0, 5)])
+    main_diagonals.append([board[i, i + 3] for i in range(0, 4)])
+    return main_diagonals
+
+
+def generate_second_diagnals(board: np.ndarray):
+    second_diagonals = []
+    second_diagonals.append([board[i, 3 - i] for i in range(0, 4)])
+    second_diagonals.append([board[i, 4 - i] for i in range(0, 5)])
+    second_diagonals.append([board[i, 5 - i] for i in range(0, 6)])
+    second_diagonals.append([board[i, 6 - i] for i in range(0, 6)])
+    second_diagonals.append([board[i, 7 - i] for i in range(1, 6)])
+    second_diagonals.append([board[i, 8 - i] for i in range(2, 6)])
+    return second_diagonals
 
 
 def connected_four(
@@ -141,26 +164,14 @@ def connected_four(
             return True
 
     # main diagonals orientation
-    main_diagonals = []
-    main_diagonals.append([board[i, i] for i in range(0, 6)])
-    main_diagonals.append([board[i, i - 1] for i in range(1, 6)])
-    main_diagonals.append([board[i, i - 2] for i in range(2, 6)])
-    main_diagonals.append([board[i, i + 1] for i in range(0, 6)])
-    main_diagonals.append([board[i, i + 2] for i in range(0, 5)])
-    main_diagonals.append([board[i, i + 3] for i in range(0, 4)])
+    main_diagonals = generate_main_diagonals(board)
 
     for d in main_diagonals:
         if connected_four_line(np.array(d), player):
             return True
 
     # second diagonal orientation
-    second_diagonals = []
-    second_diagonals.append([board[i, 3 - i] for i in range(0, 4)])
-    second_diagonals.append([board[i, 4 - i] for i in range(0, 5)])
-    second_diagonals.append([board[i, 5 - i] for i in range(0, 6)])
-    second_diagonals.append([board[i, 6 - i] for i in range(0, 6)])
-    second_diagonals.append([board[i, 7 - i] for i in range(1, 6)])
-    second_diagonals.append([board[i, 8 - i] for i in range(2, 6)])
+    second_diagonals = generate_second_diagnals(board)
 
     for d in second_diagonals:
         if connected_four_line(np.array(d), player):
