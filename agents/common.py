@@ -34,13 +34,15 @@ class GameState(Enum):
 def initialize_game_state() -> np.ndarray:
     """
     Returns an ndarray, shape (6, 7) and data type (dtype) BoardPiece, initialized to 0 (NO_PLAYER).
+    :return: an empty board
     """
+
     return np.zeros((6, 7), BoardPiece)
 
 
 def pretty_print_board(board: np.ndarray) -> str:
     """
-    Should return `board` converted to a human readable string representation,
+    Returns `board` converted to a human readable string representation,
     to be used when playing or printing diagnostics to the console (stdout). The piece in
     board[0, 0] should appear in the lower-left. Here's an example output, note that we use
     PLAYER1_Print to represent PLAYER1 and PLAYER2_Print to represent PLAYER2):
@@ -53,6 +55,8 @@ def pretty_print_board(board: np.ndarray) -> str:
     |  O O X X     |
     |==============|
     |0 1 2 3 4 5 6 |
+    :param board: the board state as ndarray
+    :return: string corresponding to board state
     """
 
     board_str = "|==============|\n"
@@ -78,6 +82,8 @@ def string_to_board(pp_board: str) -> np.ndarray:
     Takes the output of pretty_print_board and turns it back into an ndarray.
     This is quite useful for debugging, when the agent crashed and you have the last
     board state as a string.
+    :param pp_board: string corresponding to the board state
+    :return: board state as ndarray
     """
 
     start_index = pp_board.find('=|\n') + len('=|\n')
@@ -107,6 +113,11 @@ def apply_player_action(
     """
     Sets board[i, action] = player, where i is the lowest open row. The modified
     board is returned. If copy is True, makes a copy of the board before modifying it.
+    :param board: the current board state
+    :param action: player's column choice fro doing the next move, an integer between (0, 6)
+    :param player: the player making the action on the current board
+    :param copy: flag that copies the board before the action
+    :return: board state after the action was made by the player
     """
     action = np.int(action)
     if np.int(action) < 0 or np.int(action) > 6:
@@ -124,6 +135,11 @@ def apply_player_action(
 
 
 def generate_main_diagonals(board: np.ndarray):
+    """
+    Helper function that generates all the diagonals parallel to the main diagonal and have at least 4 elements.
+    :param board: the board state for which the diagonals are extracted
+    :return: list of diagonals
+    """
     main_diagonals = []
     main_diagonals.append([board[i, i] for i in range(0, 6)])
     main_diagonals.append([board[i, i - 1] for i in range(1, 6)])
@@ -135,6 +151,11 @@ def generate_main_diagonals(board: np.ndarray):
 
 
 def generate_second_diagnals(board: np.ndarray):
+    """
+    Helper function that generates all the diagonals parallel to the second diagonal and have at least 4 elements.
+    :param board: the board state for which the diagonals are extracted
+    :return: list of diagonals
+    """
     second_diagonals = []
     second_diagonals.append([board[i, 3 - i] for i in range(0, 4)])
     second_diagonals.append([board[i, 4 - i] for i in range(0, 5)])
@@ -153,6 +174,10 @@ def connected_four(
     in either a horizontal, vertical, or diagonal line. Returns False otherwise.
     If desired, the last action taken (i.e. last column played) can be provided
     for potential speed optimisation.
+    :param board: the current state of the board
+    :param player: the player who checks if they have 4 piesces connected
+    :param last_action:
+    :return: boolean that says if there are 4 connected pieces
     """
 
     for i in range(6):
@@ -207,6 +232,10 @@ def check_end_state(
     Returns the current game state for the current `player`, i.e. has their last
     action won (GameState.IS_WIN) or drawn (GameState.IS_DRAW) the game,
     or is play still on-going (GameState.STILL_PLAYING)?
+    :param board: current state of the board
+    :param player: player that requires the state check
+    :param last_action:
+    :return: the GameState
     """
 
     if connected_four(board, player):

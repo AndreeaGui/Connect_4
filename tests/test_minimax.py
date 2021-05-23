@@ -41,7 +41,6 @@ b1_child6[0, 5] = PLAYER1
 b1_child7 = b1.copy()
 b1_child7[0, 6] = PLAYER1
 
-
 b2 = np.empty((6, 7), dtype=BoardPiece)
 b2.fill(NO_PLAYER)
 b2[0, 1] = PLAYER2
@@ -63,6 +62,30 @@ b2[2, 4] = PLAYER1
 |    X X       |
 |    O X X     |
 |  O O O O     |
+|  O O X X     |
+|==============|
+|0 1 2 3 4 5 6 |'''
+
+b3 = b1.copy()
+b3[0, 5] = PLAYER1
+'''|==============|
+|              |
+|              |
+|    X X       |
+|    O X X     |
+|  O X O O     |
+|  O O X X X   |
+|==============|
+|0 1 2 3 4 5 6 |'''
+
+b4 = b1.copy()
+b4[2, 1] = PLAYER1
+'''|==============|
+|              |
+|              |
+|    X X       |
+|  X O X X     |
+|  O X O O     |
 |  O O X X     |
 |==============|
 |0 1 2 3 4 5 6 |'''
@@ -89,3 +112,48 @@ def test_compute_score():
     assert compute_score(b1, PLAYER1) == 0
     assert compute_score(b1, PLAYER2) == 0
 
+
+def test_compute_score_2():
+    from agents.agent_minimax.minimax import compute_score_2
+
+    ### b3 vs b1: 3rd X added in a lline
+    assert compute_score_2(b3, PLAYER1) > compute_score_2(b3, PLAYER2)
+    assert compute_score_2(b1, PLAYER1) < compute_score_2(b3, PLAYER1)
+
+    ### b4 vs b1: 3rd X added in a diagonal
+    assert compute_score_2(b4, PLAYER1) > compute_score_2(b4, PLAYER2)
+    assert compute_score_2(b4, PLAYER1) > compute_score_2(b1, PLAYER1)
+    assert compute_score_2(b4, PLAYER2) < compute_score_2(b1, PLAYER2)
+
+    ### b2: O wins
+    assert compute_score_2(b2, PLAYER2) > compute_score_2(b2, PLAYER1)
+    assert compute_score_2(b2, PLAYER2) > compute_score_2(b1, PLAYER2)
+    assert compute_score_2(b2, PLAYER2) > compute_score_2(b3, PLAYER2)
+    assert compute_score_2(b2, PLAYER1) < compute_score_2(b1, PLAYER1)
+    assert compute_score_2(b2, PLAYER1) < compute_score_2(b3, PLAYER1)
+
+
+def test_find_opponent():
+    from agents.agent_minimax.minimax import find_opponent
+    assert PLAYER2 == find_opponent(PLAYER1)
+    assert PLAYER1 == find_opponent(PLAYER2)
+    assert PLAYER2 == find_opponent(NO_PLAYER)  # PLAYER2 is the default opponent
+
+
+def test_minimax_algorithm():
+    from agents.agent_minimax.minimax import minimax_algorithm
+
+    # next move on column 6 would lead to a win for PLAYER1
+    score = minimax_algorithm(b3, PLAYER1, PLAYER1, 1)
+    assert score > 1000
+    # next move on column 6 would lead to a loose for PLAYER2
+    score2 = minimax_algorithm(b3, PLAYER2, PLAYER1, 1)
+    assert score2 < -1000
+    # no win or loose in the next move
+    score3 = minimax_algorithm(b1, PLAYER1, PLAYER1, 1)
+    assert score3 < 1000
+    assert score3 > -1000
+    # no win or loose in the next 2 move
+    score4 = minimax_algorithm(b1, PLAYER1, PLAYER1, 2)
+    assert score4 < 1000
+    assert score4 > -1000

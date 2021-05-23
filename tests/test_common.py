@@ -125,7 +125,7 @@ def test_apply_player_action():
 
     action = PlayerAction(3)
     player = PLAYER1
-    board = initialize_game_state()  # TODO replace it with hardcoded board
+    board = b1
     board_after_action = apply_player_action(board, action, player)
     assert board_after_action.shape == board.shape
     assert board_after_action.any() == PLAYER1
