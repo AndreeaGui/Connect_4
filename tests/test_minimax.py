@@ -157,3 +157,6 @@ def test_minimax_algorithm():
     score4 = minimax_algorithm(b1, PLAYER1, PLAYER1, 2)
     assert score4 < 1000
     assert score4 > -1000
+
+# Remark: you should add a test to check whether your minimax implementation finds simple moves (i.e. finds wins in 1 move
+#         or blocks a win for the opponent in 1 move)

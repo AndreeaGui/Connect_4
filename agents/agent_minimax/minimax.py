@@ -49,9 +49,13 @@ def find_line_score(line: np.ndarray, player: BoardPiece) -> int:
     for first_element in range(0, len(line) - 3):
         possible_pattern = line[first_element:first_element + 4]
         counts = np.zeros(3)
+        # Remark: Why are you flipping the sign of the score depending on the player?
+        #         You are using vanilla minimax, which means one player should maximize, one should minimize.
+        #         This only works if they score in the same way. In your case, PLAYER1 and PLAYER2 should try to maximize.
         counts[0] = np.sum([possible_pattern == PLAYER1])
         counts[1] = np.sum([possible_pattern == PLAYER2])
         counts[2] = np.sum([possible_pattern == NO_PLAYER])
+        # Remark: the copied stuff below is a good hint that this should be refactored
         assert (np.sum(counts)) == 4
         if player == PLAYER1:
             if np.all(counts == np.array([4, 0, 0])):
@@ -91,6 +95,7 @@ def find_line_score(line: np.ndarray, player: BoardPiece) -> int:
 
 
 def compute_score_2(board: np.ndarray, player: BoardPiece) -> int:
+    # Remark: this is not a good name for a function
     """
     This method is a smart heuristic for minimax. It associates a score to each board state.
     :param board: the board state that needs computing the score
@@ -120,15 +125,19 @@ def generate_child_boards(board: np.array, player: BoardPiece) -> [np.array]:
     :param player: the current player, making the next move
     :return: a list of 7 child boards
     """
+    # Remark: what if one column is full? You don't check that in your apply_player_action function.
     children_boards = []
 
     for move in range(7):
         board_copy = board.copy()
         children_boards.append(apply_player_action(board_copy, np.int8(move), player))
+        # You could use the copy flag in the apply_player_action function directly!
 
     return children_boards
 
-
+# Remark: I get why you split off the minimax algorithm and apply it to the level after the root node, but I think it's
+#         cleaner if you would make it fully self-consistent (e.g. checking the depth to see whether you score the board
+#         or should return a move)
 def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: Optional[SavedState], depth=4
                           ) -> Tuple[PlayerAction, Optional[SavedState]]:
     """
@@ -161,13 +170,14 @@ def minimax_algorithm(board: np.ndarray, root_player: BoardPiece, current_player
     :param beta: beta factor in alpha-beta pruning
     :return:
     """
+
     if depth == 0 or check_end_state(board, current_player) != GameState.STILL_PLAYING:
         # score = compute_score(board, root_player)
         score = compute_score_2(board, root_player)
         return score
 
     children = generate_child_boards(board, current_player)
-
+    # See the remark in find_line_score. Your minimax doesn't fit the scoring system, you're closer to a variant of negamax.
     if current_player == root_player:
         max_score = NEGATIVE_INF
         for i in range(len(children)):

@@ -14,5 +14,6 @@ def generate_move_random(
     :param saved_state: the last saved state of the board
     :return: the column of the next move, the nwe saved state
     """
+    # Remark: what about full columns?
     action = PlayerAction(random.randint(0, 6))
     return action, saved_state

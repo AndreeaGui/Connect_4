@@ -93,6 +93,11 @@ def string_to_board(pp_board: str) -> np.ndarray:
     board_str = board_str.replace("\n", "")
 
     board = initialize_game_state()
+    # Remark: Have a a look at enumerations, they are a neat feature of Python tying together looping and indexing.
+    # Remark: You could write:
+    # for string_index, i in enumerate(range(5, -1, -1)):
+    #     ...
+    # Remark: and leave out the line where you create the variable string_index
     string_index = 0
     for i in range(5, -1, -1):
         for j in range(7):
@@ -120,14 +125,17 @@ def apply_player_action(
     :return: board state after the action was made by the player
     """
     action = np.int(action)
+    # Remark: it's a bit inconsistent that you catch actions that are out of bounds, but not actions that aim at a full column
     if np.int(action) < 0 or np.int(action) > 6:
         raise ValueError
+    # Remark: you could refactor the lines below which find the lowest open row into a function, makes reuse easier
     i = 0
     while i <= 5 and board[i, action] != 0:
         i += 1
     if i <= 5:
         if copy:
             initial_board = np.copy(board)  # what do we do with this copy?
+            # Remark: The copy is necessary, because we might want to return the changed board without modifying the variable 'board' used as input
         board[i, action] = player
     # else:
     #     raise ValueError
@@ -141,6 +149,7 @@ def generate_main_diagonals(board: np.ndarray):
     :return: list of diagonals
     """
     main_diagonals = []
+    # Remark: check np.diag(), should make your life a bit easier
     main_diagonals.append([board[i, i] for i in range(0, 6)])
     main_diagonals.append([board[i, i - 1] for i in range(1, 6)])
     main_diagonals.append([board[i, i - 2] for i in range(2, 6)])
@@ -157,6 +166,7 @@ def generate_second_diagnals(board: np.ndarray):
     :return: list of diagonals
     """
     second_diagonals = []
+    # Remark: again, check np.diag()
     second_diagonals.append([board[i, 3 - i] for i in range(0, 4)])
     second_diagonals.append([board[i, 4 - i] for i in range(0, 5)])
     second_diagonals.append([board[i, 5 - i] for i in range(0, 6)])
