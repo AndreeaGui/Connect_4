@@ -108,6 +108,11 @@ b5.fill(PLAYER1)
 b5[0:3, [1, 3, 5]] = PLAYER2
 b5[3:6, [0, 2, 4, 6]] = PLAYER2
 
+b6 = np.empty((6, 7), dtype=BoardPiece)
+b6.fill(NO_PLAYER)
+b6[0, :] = PLAYER1
+b6[:, 3] = PLAYER2
+
 
 def test_initialize_game_state():
     from agents.common import initialize_game_state
@@ -181,3 +186,16 @@ def test_string_to_board():
                 "|==============|\n" \
                 "|0 1 2 3 4 5 6 |\n"
     assert np.all(string_to_board(b4_string) == b4)
+
+
+def test_find_opponent():
+    from agents.common import find_opponent
+    assert PLAYER2 == find_opponent(PLAYER1)
+    assert PLAYER1 == find_opponent(PLAYER2)
+    assert PLAYER2 == find_opponent(NO_PLAYER)  # PLAYER2 is the default opponent
+
+
+def test_possible_moves():
+    from agents.common import possible_moves
+    assert possible_moves(b6) == [0, 1, 2, 4, 5, 6]
+

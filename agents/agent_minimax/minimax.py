@@ -1,23 +1,12 @@
 from agents.common import PlayerAction, BoardPiece, SavedState, GenMove, PLAYER1, PLAYER2, NO_PLAYER, GameState
 from agents.common import connected_four, apply_player_action, check_end_state
-from agents.common import generate_main_diagonals, generate_second_diagnals
+from agents.common import generate_main_diagonals, generate_second_diagnals, find_opponent
 import numpy as np
 from typing import Optional, Callable, Tuple
 import math
 
 POSITIVE_INF = math.inf
 NEGATIVE_INF = -math.inf
-
-
-def find_opponent(player: BoardPiece) -> BoardPiece:
-    """
-    This method returns the opponent for player.
-    :param player: the player we want to find the opponent for
-    :return: the opponent
-    """
-    if player == PLAYER2:
-        return PLAYER1
-    return PLAYER2
 
 
 def compute_score(board: np.ndarray, player: BoardPiece) -> float:
@@ -143,7 +132,9 @@ def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: Op
     scores = np.zeros(7)
 
     for i in range(len(children)):
-        scores[i] = minimax_algorithm(children[i], player, find_opponent(player), depth - 1, NEGATIVE_INF, POSITIVE_INF)
+        # scores[i] = minimax_algorithm(children[i], player, find_opponent(player), depth - 1, NEGATIVE_INF, POSITIVE_INF)
+        scores[i] = minimax_algorithm(children[i], player, player, depth - 1, NEGATIVE_INF, POSITIVE_INF)
+
     next_move = np.argmax(scores)
 
     return np.int8(next_move), saved_state

@@ -29,6 +29,7 @@ class GameState(Enum):
     IS_WIN = 1
     IS_DRAW = -1  # remiza
     STILL_PLAYING = 0
+    IS_LOST = 2
 
 
 def initialize_game_state() -> np.ndarray:
@@ -114,7 +115,7 @@ def apply_player_action(
     Sets board[i, action] = player, where i is the lowest open row. The modified
     board is returned. If copy is True, makes a copy of the board before modifying it.
     :param board: the current board state
-    :param action: player's column choice fro doing the next move, an integer between (0, 6)
+    :param action: player's column choice for doing the next move, an integer between (0, 6)
     :param player: the player making the action on the current board
     :param copy: flag that copies the board before the action
     :return: board state after the action was made by the player
@@ -126,11 +127,17 @@ def apply_player_action(
     while i <= 5 and board[i, action] != 0:
         i += 1
     if i <= 5:
-        if copy:
-            initial_board = np.copy(board)  # what do we do with this copy?
-        board[i, action] = player
-    # else:
-    #     raise ValueError
+        row = i
+        col = action
+    else:
+        return board
+
+    if copy:
+        new_board = np.copy(board)
+        new_board[row, col] = player
+        return new_board
+    else:
+        board[row, col] = player
     return board
 
 
@@ -240,6 +247,36 @@ def check_end_state(
 
     if connected_four(board, player):
         return GameState.IS_WIN
+    if player == PLAYER1:
+        opponent = PLAYER2
+    else:
+        opponent = PLAYER1
+    if connected_four(board, opponent):
+        return GameState.IS_LOST
     if NO_PLAYER in board:
         return GameState.STILL_PLAYING
     return GameState.IS_DRAW
+
+
+def find_opponent(player: BoardPiece) -> BoardPiece:
+    """
+    This method returns the opponent for player.
+    :param player: the player we want to find the opponent for
+    :return: the opponent
+    """
+    if player == PLAYER2:
+        return PLAYER1
+    return PLAYER2
+
+
+def possible_moves(board: np.ndarray):
+    """
+    Returns the list of columns where the agent can make the next move.
+    :param board: the current board
+    :return: a list of legal moves
+    """
+    next_move = []
+    for i in range(7):
+        if np.any(board[:, i] == NO_PLAYER):
+            next_move.append(i)
+    return next_move

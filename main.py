@@ -3,6 +3,7 @@ from typing import Optional, Callable
 from agents.common import PlayerAction, BoardPiece, SavedState, GenMove
 from agents.agent_random import generate_move
 from agents.agent_minimax import generate_move
+from agents.agent_mcts import generate_move
 
 
 def user_move(board: np.ndarray, _player: BoardPiece, saved_state: Optional[SavedState]):
@@ -40,6 +41,7 @@ def human_vs_agent(
         player_names = (player_1, player_2)[::play_first]
         gen_args = (args_1, args_2)[::play_first]
 
+        move_average = []
         playing = True
         while playing:
             for player, player_name, gen_move, args in zip(
@@ -53,7 +55,11 @@ def human_vs_agent(
                 action, saved_state[player] = gen_move(
                     board.copy(), player, saved_state[player], *args
                 )
-                print(f"Move time: {time.time() - t0:.3f}s")
+                move_time = time.time() - t0
+                move_average.append(move_time)
+                print(f"Move time: {move_time:.3f}s")
+                # print("added")
+
                 apply_player_action(board, action, player)
                 end_state = check_end_state(board, player)
                 if end_state != GameState.STILL_PLAYING:
@@ -66,6 +72,8 @@ def human_vs_agent(
                         )
                     playing = False
                     break
+        avg_time = np.array(move_average[1::2]).mean()
+        print(f"Average time of the first player: {avg_time:.3f}s")
 
 
 if __name__ == "__main__":

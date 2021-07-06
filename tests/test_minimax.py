@@ -133,13 +133,6 @@ def test_compute_score_2():
     assert compute_score_2(b2, PLAYER1) < compute_score_2(b3, PLAYER1)
 
 
-def test_find_opponent():
-    from agents.agent_minimax.minimax import find_opponent
-    assert PLAYER2 == find_opponent(PLAYER1)
-    assert PLAYER1 == find_opponent(PLAYER2)
-    assert PLAYER2 == find_opponent(NO_PLAYER)  # PLAYER2 is the default opponent
-
-
 def test_minimax_algorithm():
     from agents.agent_minimax.minimax import minimax_algorithm
 
