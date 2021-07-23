@@ -2,6 +2,9 @@ import numpy as np
 from agents.common import BoardPiece, NO_PLAYER, PLAYER1, PLAYER2, PlayerAction, GameState
 from agents.agent_mcts.mcts import MCTSNode
 
+# Remark: good tests overall, they're easy to understand and specific. Some cases could be a bit more complicated
+#  though.
+
 b1 = np.empty((6, 7), dtype=BoardPiece)
 b1.fill(NO_PLAYER)
 b1[0, 1] = PLAYER2
@@ -55,6 +58,7 @@ def test_ucb1():
     s1 = upper_confidence_bound_1(child_1.wins, child_1.plays, child_1.parent.plays)
     s2 = upper_confidence_bound_1(child_2.wins, child_2.plays, child_2.parent.plays)
     assert s1 < s2
+    # Remark: you should test the specific value as well
 
 
 def test_run_simulation():
@@ -66,6 +70,18 @@ def test_run_simulation():
         assert check_end_state(final_board, parent_node.player) == game_status
         assert game_status == GameState.IS_WIN or game_status == GameState.IS_LOST
         assert game_status != GameState.STILL_PLAYING
+    # Remark: a random game is hard to test of course, and I think what you're doing here is easily good enough because it's
+    #         a quite easy case.
+    #         Just for the sake of illustration (and I know that it's a bit overkill here, but maybe you'll find it useful):
+    #         I think this is a case where TDD proper would lead to code that is easier to test (I'm assuming you didn't write
+    #         tests first for this function, sorry if I'm wrong - but if you did, this could be an even more useful tangent).
+    #         If you would write tests first, you would be confronted with the question what the random game is supposed to do,
+    #         of course,  and - and this is the crucial point - how you would know that your random gane is doing what it should.
+    #         So you could, for example, check whether the player changes on every move or if the board changes on every move
+    #         and whether it changes in the right way (only one column etc).
+    #         Once you've written a test for that, your implementation would have to follow this demand. Overall, your code
+    #         would thus be super easy to test and you could do more than just checking whether the output is True or False
+    #         (which you would know anyway because using the function wouldn't be possible in this case).
 
 
 def test_do_expansion():
@@ -91,6 +107,8 @@ def test_do_selection():
     parent_node_1 = MCTSNode(b1, PLAYER2)
     for _ in parent_node_1.children_index:
         do_expansion(parent_node_1)
+        # Remark: it would be safer to do the expansion by hand here in order to test expansion and selection
+        #  independently
     assert do_selection(parent_node_1) == parent_node_1.children[0]
 
     parent_node_2 = MCTSNode(b1, PLAYER2)
@@ -101,6 +119,8 @@ def test_do_selection():
             n.wins = 2
         print(i)
     assert do_selection(parent_node_2) == parent_node_2.children[4]
+    # Remark: you should also test whether selection works with more than 2 levels, to see whether the loop works
+    #  correctly
 
 
 def test_back_propagate_statistics():
